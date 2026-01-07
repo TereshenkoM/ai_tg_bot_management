@@ -1,24 +1,20 @@
 import asyncio
 from logging.config import fileConfig
 
+from alembic import context
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from alembic import context
 from src.config import config as app_config
 from src.db.postgres.config import Base
 from src.db.postgres.models import AiModels
-
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-config.set_main_option(
-    'sqlalchemy.url',
-    app_config.get_db_url + "?async_fallback=True"
-)
+config.set_main_option("sqlalchemy.url", app_config.get_db_url + "?async_fallback=True")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -65,7 +61,7 @@ def do_run_migrations(connection: Connection) -> None:
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
-        compare_server_default=True
+        compare_server_default=True,
     )
 
     with context.begin_transaction():
