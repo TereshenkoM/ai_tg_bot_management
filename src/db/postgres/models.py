@@ -22,3 +22,12 @@ class AiModels(Base):
             onupdate=datetime.datetime.now,
         ),
     ]
+
+
+class AdminUser(Base):
+    __tablename__ = "admin_users"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[Annotated[str, 150]] = mapped_column(unique=True, index=True)
+    password_hash: Mapped[Annotated[str, 250]]
+    is_active: Mapped[bool] = mapped_column(default=True)

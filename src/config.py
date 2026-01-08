@@ -14,6 +14,11 @@ class Config(BaseSettings):
     CH_DB_PASS: str
     CH_DB_NAME: str
 
+    CSRF_SESSION_KEY: str = "csrf_token"
+    SESSION_SECRET: str
+
+    APP_ENV: str
+
     @property
     def get_db_url(self):
         return f"postgresql+asyncpg://{self.PG_DB_USER}:{self.PG_DB_PASS}@{self.PG_DB_HOST}:{self.PG_DB_PORT}/{self.PG_DB_NAME}"
