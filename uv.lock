@@ -28,7 +28,7 @@ requires-dist = [
     { name = "alembic", specifier = ">=1.17.2" },
     { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "clickhouse-connect", specifier = ">=0.10.0" },
-    { name = "company-logger", git = "ssh://git@github.com/TereshenkoM/ai_tg_bot_logger.git?rev=main" },
+    { name = "company-logger", git = "ssh://git@github.com/TereshenkoM/ai_tg_bot_logger.git?rev=v0.1.0" },
     { name = "fastapi", specifier = ">=0.128.0" },
     { name = "itsdangerous", specifier = ">=2.2.0" },
     { name = "passlib", specifier = ">=1.7.4" },
@@ -165,7 +165,7 @@ wheels = [
 [[package]]
 name = "company-logger"
 version = "0.1.0"
-source = { git = "ssh://git@github.com/TereshenkoM/ai_tg_bot_logger.git?rev=main#55948df9afb02f40802ed392a59cb2e6c56c312e" }
+source = { git = "ssh://git@github.com/TereshenkoM/ai_tg_bot_logger.git?rev=v0.1.0#df739f1724fb43adcd9facc6cb5753071caad11e" }
 dependencies = [
     { name = "fastapi" },
 ]
