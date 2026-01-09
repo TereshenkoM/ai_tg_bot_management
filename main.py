@@ -7,7 +7,7 @@ from src.db.postgres.config import engine
 from src.config import config
 from logger import setup_logging, get_logger, RequestIdMiddleware
 
-setup_logging(service_name="users-service")
+setup_logging(service_name="management")
 
 log = get_logger(__name__)
 app = FastAPI()
