@@ -2,7 +2,7 @@ from typing import Callable
 from fastapi import FastAPI
 from sqladmin import Admin
 
-from src.admin.views import AiModelsAdmin
+from src.admin.views import AiModelsAdmin, ModelResponsesAdmin
 from src.auth.admin_backend import AdminAuthBackend
 from src.repositories.postgres.uow import PostgresUoW
 
@@ -24,3 +24,4 @@ def setup_admin(
         authentication_backend=auth_backend,
     )
     admin.add_view(AiModelsAdmin)
+    admin.add_view(ModelResponsesAdmin)

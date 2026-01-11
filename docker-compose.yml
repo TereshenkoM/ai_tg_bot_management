@@ -45,6 +45,22 @@ services:
     security_opt:
       - no-new-privileges:true
 
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      ssh:
+        - default
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app_backend
+    restart: "no"
+    command: [ "python", "-m", "alembic", "upgrade", "head" ]
+
   management:
     build:
       context: .
