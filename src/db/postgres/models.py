@@ -16,14 +16,17 @@ class AiModels(Base):
     name: Mapped[Annotated[str, 200]]
     available: Mapped[bool]
 
-    created_at = Annotated[datetime.datetime, mapped_column(server_default=func.now())]
-    updated_at = Annotated[
-        datetime.datetime,
-        mapped_column(
-            server_default=text("TIMEZONE('utc', now())"),
-            onupdate=datetime.datetime.now,
-        ),
-    ]
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=text("TIMEZONE('utc', now())"),
+        onupdate=func.now(),
+        nullable=False,
+    )
 
     class Meta:
         admin_title = "AI Models"
@@ -40,14 +43,17 @@ class AdminUser(Base):
     password_hash: Mapped[Annotated[str, 250]]
     is_active: Mapped[bool] = mapped_column(default=True)
 
-    created_at = Annotated[datetime.datetime, mapped_column(server_default=func.now())]
-    updated_at = Annotated[
-        datetime.datetime,
-        mapped_column(
-            server_default=text("TIMEZONE('utc', now())"),
-            onupdate=datetime.datetime.now,
-        ),
-    ]
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=text("TIMEZONE('utc', now())"),
+        onupdate=func.now(),
+        nullable=False,
+    )
 
 
 class ModelResponses(Base):
@@ -56,14 +62,17 @@ class ModelResponses(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     data: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
 
-    created_at = Annotated[datetime.datetime, mapped_column(server_default=func.now())]
-    updated_at = Annotated[
-        datetime.datetime,
-        mapped_column(
-            server_default=text("TIMEZONE('utc', now())"),
-            onupdate=datetime.datetime.now,
-        ),
-    ]
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=text("TIMEZONE('utc', now())"),
+        onupdate=func.now(),
+        nullable=False,
+    )
 
     __table_args__ = (
         Index("ix_json_store_data_gin", "data", postgresql_using="gin"),
