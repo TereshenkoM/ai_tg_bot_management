@@ -25,6 +25,12 @@ class AiModels(Base):
         ),
     ]
 
+    class Meta:
+        admin_title = "AI Models"
+        admin_icon = "cpu"
+        admin_default_order = ("id",)
+        admin_columns = ("id", "name", "available")
+
 
 class AdminUser(Base):
     __tablename__ = "admin_users"
@@ -62,3 +68,9 @@ class ModelResponses(Base):
     __table_args__ = (
         Index("ix_json_store_data_gin", "data", postgresql_using="gin"),
     )
+
+    class Meta:
+        admin_title = "Model responses"
+        admin_icon = "message-square"
+        admin_default_order = ("-id",)
+        admin_columns = ("id", "data", "created_at")
