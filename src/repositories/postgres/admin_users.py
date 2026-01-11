@@ -1,0 +1,9 @@
+from typing import Protocol
+
+from src.db.postgres.models import AdminUser
+
+
+class AdminUserRepository(Protocol):
+    async def get_by_username(self, username: str) -> AdminUser | None: ...
+    async def get_active_by_username(self, username: str) -> AdminUser | None: ...
+    async def create(self, user: AdminUser) -> AdminUser: ...

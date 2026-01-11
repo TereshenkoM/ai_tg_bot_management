@@ -2,33 +2,8 @@ import argparse
 import asyncio
 import getpass
 
-from sqlalchemy import select
-
-from src.auth.passwords import hash_password
-from src.db.postgres.config import async_session_maker
-from src.db.postgres.models import AdminUser
-
-
-async def cmd_createadmin(username: str, password: str) -> None:
-    async with async_session_maker() as session:
-        res = await session.execute(
-            select(AdminUser).where(AdminUser.username == username)
-        )
-        exists = res.scalar_one_or_none()
-
-        if exists:
-            raise SystemExit(f"Пользователь'{username}' уже существует")
-
-        session.add(
-            AdminUser(
-                username=username,
-                password_hash=hash_password(password),
-                is_active=True,
-            )
-        )
-        await session.commit()
-
-    print(f"Пользователь '{username}' создан")
+from src.runtime import postgres_uow_factory
+from src.services.admin_user_service import AdminUserService
 
 
 def prompt_username(value: str | None) -> str:
@@ -53,10 +28,22 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m src.management")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p = sub.add_parser("createsuperuser", help="Создаёт администратора")
+    p = sub.add_parser("createadmin", help="Создаёт администратора")
     p.add_argument("--username", "-u", help="Имя пользователя")
     p.add_argument("--password", "-p", help="Пароль")
     return parser
+
+
+async def run_createadmin(username: str, password: str) -> None:
+    service = AdminUserService(postgres_uow_factory)
+    try:
+        user = await service.create_admin(username, password)
+    except RuntimeError as e:
+        raise SystemExit(str(e))
+    except ValueError as e:
+        raise SystemExit(str(e))
+
+    print(f"Пользователь '{user.username}' создан")
 
 
 def main() -> None:
@@ -66,7 +53,7 @@ def main() -> None:
     if args.command == "createadmin":
         username = prompt_username(args.username)
         password = prompt_password(args.password)
-        asyncio.run(cmd_createadmin(username, password))
+        asyncio.run(run_createadmin(username, password))
         return
 
     raise SystemExit("Неизвестная команда")

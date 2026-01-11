@@ -11,7 +11,7 @@ from src.admin.routes import admin_router
 from src.admin.setup import setup_admin
 from src.config import KafkaConsumerConfig, config
 from src.db.postgres.config import engine
-from src.runtime import consume_loop
+from src.runtime import consume_loop, postgres_uow_factory
 
 setup_logging(service_name="management")
 logger = get_logger(__name__)
@@ -57,4 +57,4 @@ app.add_middleware(
 app.add_middleware(RequestIdMiddleware)
 
 app.include_router(admin_router)
-setup_admin(app, engine, session_secret=config.SESSION_SECRET)
+setup_admin(app, engine, session_secret=config.SESSION_SECRET, uow_factory=postgres_uow_factory)
