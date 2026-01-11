@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from src.auth.csrf import validate_csrf, ensure_csrf_token
 from src.auth.admin_backend import AdminAuthBackend
+from src.auth.csrf import ensure_csrf_token, validate_csrf
 
 admin_router = APIRouter()
+
 
 def get_templates() -> Jinja2Templates:
     templates = Jinja2Templates(directory="src/templates")
@@ -15,7 +16,9 @@ def get_templates() -> Jinja2Templates:
 
 
 @admin_router.get("/admin/login", response_class=HTMLResponse)
-async def admin_login_get(request: Request,):
+async def admin_login_get(
+    request: Request,
+):
     auth: AdminAuthBackend = request.app.state.admin_auth
 
     if await auth.authenticate(request):
@@ -26,6 +29,7 @@ async def admin_login_get(request: Request,):
         "login_admin.html",
         {"request": request, "error": None},
     )
+
 
 @admin_router.post("/admin/login", response_class=HTMLResponse)
 async def admin_login_post(

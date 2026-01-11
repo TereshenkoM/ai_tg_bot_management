@@ -4,14 +4,16 @@ import getpass
 
 from sqlalchemy import select
 
+from src.auth.passwords import hash_password
 from src.db.postgres.config import async_session_maker
 from src.db.postgres.models import AdminUser
-from src.auth.passwords import hash_password
 
 
 async def cmd_createadmin(username: str, password: str) -> None:
     async with async_session_maker() as session:
-        res = await session.execute(select(AdminUser).where(AdminUser.username == username))
+        res = await session.execute(
+            select(AdminUser).where(AdminUser.username == username)
+        )
         exists = res.scalar_one_or_none()
 
         if exists:

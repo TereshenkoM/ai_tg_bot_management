@@ -1,6 +1,8 @@
-import secrets
 import hmac
-from fastapi import Request, HTTPException
+import secrets
+
+from fastapi import HTTPException, Request
+
 from src.config import config
 
 
@@ -10,6 +12,7 @@ def ensure_csrf_token(request: Request) -> str:
         token = secrets.token_urlsafe(32)
         request.session[config.CSRF_SESSION_KEY] = token
     return token
+
 
 def validate_csrf(request: Request, token_from_form: str) -> None:
     token_in_session = request.session.get(config.CSRF_SESSION_KEY)

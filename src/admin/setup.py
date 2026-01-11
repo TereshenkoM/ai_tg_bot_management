@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from sqladmin import Admin
-from src.auth.admin_backend import AdminAuthBackend
+
 from src.admin.views import AiModelsAdmin
+from src.auth.admin_backend import AdminAuthBackend
 
 
 def setup_admin(app: FastAPI, engine, session_secret: str) -> None:

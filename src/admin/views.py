@@ -1,6 +1,6 @@
-from src.db.postgres.models import AiModels
 from sqladmin import ModelView
 
+from src.db.postgres.models import AiModels
 
 
 class AiModelsAdmin(ModelView, model=AiModels):

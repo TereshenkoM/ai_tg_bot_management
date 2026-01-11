@@ -2,10 +2,10 @@ from fastapi import Request
 from sqladmin.authentication import AuthenticationBackend
 from sqlalchemy import select
 
-from src.db.postgres.config import async_session_maker
-from src.db.postgres.models import AdminUser
 from src.auth.csrf import validate_csrf
 from src.auth.passwords import verify_password
+from src.db.postgres.config import async_session_maker
+from src.db.postgres.models import AdminUser
 
 
 class AdminAuthBackend(AuthenticationBackend):
