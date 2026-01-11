@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from logger import RequestIdMiddleware, get_logger, setup_logging
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.templating import Jinja2Templates
 
 from src.adapters.kafka_consumer import KafkaConsumer
 from src.admin.routes import admin_router
@@ -13,12 +14,23 @@ from src.config import KafkaConsumerConfig, config
 from src.db.postgres.config import engine
 from src.runtime import consume_loop, postgres_uow_factory
 
+from src.metrics import MetricsHub
+from src.ws_manager import WsManager
+from src.routes import router as web_router
+
 setup_logging(service_name="management")
 logger = get_logger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    app.state.templates = Jinja2Templates(directory="src/templates")
+
+    app.state.ws_manager = WsManager()
+    app.state.metrics_hub = MetricsHub(app.state.ws_manager, push_interval_sec=1.0)
+    await app.state.metrics_hub.start()
+    logger.info("metrics_hub запущен")
+
     consumer = KafkaConsumer(
         KafkaConsumerConfig(
             bootstrap_servers=config.KAFKA_BOOTSTRAP_SERVERS,
@@ -31,7 +43,9 @@ async def lifespan(app: FastAPI):
     await consumer.start()
     logger.info("consumer запущен")
 
-    consumer_task = asyncio.create_task(consume_loop(consumer))
+    consumer_task = asyncio.create_task(
+        consume_loop(consumer, metrics_hub=app.state.metrics_hub)
+    )
 
     try:
         yield
@@ -45,6 +59,10 @@ async def lifespan(app: FastAPI):
             await consumer.stop()
             logger.info("consumer остановлен")
 
+        with contextlib.suppress(Exception):
+            await app.state.metrics_hub.stop()
+        logger.info("metrics_hub остановлен")
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -56,5 +74,6 @@ app.add_middleware(
 )
 app.add_middleware(RequestIdMiddleware)
 
+app.include_router(web_router)
 app.include_router(admin_router)
 setup_admin(app, engine, session_secret=config.SESSION_SECRET, uow_factory=postgres_uow_factory)

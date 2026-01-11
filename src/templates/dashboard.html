@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <title>Realtime Dashboard</title>
+  <style>
+    body { font-family: sans-serif; padding: 16px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 12px; }
+    pre { margin: 0; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>Realtime Dashboard</h2>
+
+  <div class="grid">
+    <div class="card"><b>Всего сообщений</b><div id="m_total">—</div></div>
+    <div class="card"><b>Всего ответов</b><div id="r_total">—</div></div>
+    <div class="card"><b>Всего ошибок</b><div id="e_total">—</div></div>
+
+    <div class="card"><b>RPS (30s): messages</b><div id="m_rps">—</div></div>
+    <div class="card"><b>RPS (30s): responses</b><div id="r_rps">—</div></div>
+    <div class="card"><b>RPS (30s): errors</b><div id="e_rps">—</div></div>
+  </div>
+
+  <h3>Top models (5m)</h3>
+  <pre id="top_models">—</pre>
+
+  <script>
+    const ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws/metrics");
+
+    ws.onmessage = (ev) => {
+      const msg = JSON.parse(ev.data);
+      if (msg.type !== "metrics") return;
+
+      document.getElementById("m_total").textContent = msg.counters.messages_total ?? 0;
+      document.getElementById("r_total").textContent = msg.counters.responses_total ?? 0;
+      document.getElementById("e_total").textContent = msg.counters.errors_total ?? 0;
+
+      document.getElementById("m_rps").textContent = msg.rps_30s.messages ?? 0;
+      document.getElementById("r_rps").textContent = msg.rps_30s.responses ?? 0;
+      document.getElementById("e_rps").textContent = msg.rps_30s.errors ?? 0;
+
+      document.getElementById("top_models").textContent =
+        (msg.top_models_5m || []).map(([name, cnt]) => `${name}: ${cnt}`).join("\n") || "—";
+    };
+
+    ws.onclose = () => console.log("WS closed");
+    ws.onerror = (e) => console.log("WS error", e);
+  </script>
+</body>
+</html>
